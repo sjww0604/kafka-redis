@@ -2,7 +2,11 @@ package org.example.kafkaredis.domain.productRanking.listener;
 
 import static org.example.kafkaredis.common.model.kafka.topic.KafkaTopic.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import org.example.kafkaredis.common.model.kafka.event.PaymentCompletedEvent;
+import org.example.kafkaredis.domain.service.ProductRankingService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ProductRankingListener  {
 
+	private final ProductRankingService productRankingService;
+
 	// 아까 등록한 ConsumerFactory, ListenerContainerFactory를 통해서
 	// Kafka에 있는 데이터를 가져올 것입니다.
-
 	@KafkaListener(
 		topics = TOPIC_PAYMENT_COMPLETED,
 		groupId = "product-ranking-group",
@@ -36,7 +41,14 @@ public class ProductRankingListener  {
 
 		log.info("[상품 랭킹 조회 리스너] : 성공적으로 값을 잘 가져왔습니다!");
 
+		// 결제 완료된 시간을 기준으로 파냄 완료 랭킹을 반영해줄 예정입니다.
 
+		// 결제 완료된 시간을 String -> LocalDateTime으로 먼저 받고
+		// LocalDateTime -> LocalDate로 받아서 처리할 예정
+		LocalDateTime paidAt = LocalDateTime.parse(event.getPaidAt());
+		LocalDate currentDate = paidAt.toLocalDate();
+
+		productRankingService.increaseProductRanking(event.getProductId(), currentDate);
 	}
 
 }
