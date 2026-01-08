@@ -66,4 +66,37 @@ public class KafkaConsumerConfig {
 		return factory;
 	}
 
+	// 결제 기록 전용 컨슈머 그룹을 만들어줘야 합니다.
+	@Bean
+	public ConsumerFactory<String, PaymentCompletedEvent> paymentHistoryConsumerFactory() {
+
+		Map<String, Object> props = new HashMap<>();
+
+		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, "payment-history-group");
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+
+		// 지금부터 들어오는 값부터 받을 것이다.
+		// 처음부터 메시지를 읽지 않는다.
+		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+		JsonDeserializer<PaymentCompletedEvent> deserializer = new JsonDeserializer<>(PaymentCompletedEvent.class);
+
+		return new DefaultKafkaConsumerFactory<>(
+			props,
+			new StringDeserializer(),
+			deserializer
+		);
+	}
+
+	// Consumer Group 및 Factory가 동작할 수 있게 하는 listener container factory도 만들어줘야 함
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, PaymentCompletedEvent> paymentHistoryKafkaListenerContainerFactory() {
+
+		ConcurrentKafkaListenerContainerFactory<String, PaymentCompletedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(paymentHistoryConsumerFactory());
+
+		return factory;
+	}
 }
