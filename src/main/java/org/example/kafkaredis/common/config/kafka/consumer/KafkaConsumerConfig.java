@@ -99,4 +99,38 @@ public class KafkaConsumerConfig {
 
 		return factory;
 	}
+
+	// 배송 컨슈머 팩토리
+	@Bean
+	public ConsumerFactory<String, PaymentCompletedEvent> deliveryConsumerFactory() {
+
+		Map<String, Object> props = new HashMap<>();
+
+		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+		props.put(ConsumerConfig.GROUP_ID_CONFIG, "delivery-group");
+		props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+
+		// 지금부터 들어오는 값부터 받을 것이다.
+		// 처음부터 메시지를 읽지 않는다.
+		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+
+		JsonDeserializer<PaymentCompletedEvent> deserializer = new JsonDeserializer<>(PaymentCompletedEvent.class);
+
+		return new DefaultKafkaConsumerFactory<>(
+			props,
+			new StringDeserializer(),
+			deserializer
+		);
+	}
+
+	// 배송 관련 리스너 컨테이너 팩토리
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, PaymentCompletedEvent> deliveryKafkaListenerContainerFactory() {
+
+		ConcurrentKafkaListenerContainerFactory<String, PaymentCompletedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(deliveryConsumerFactory());
+
+		return factory;
+	}
 }
