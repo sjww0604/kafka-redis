@@ -29,8 +29,7 @@
 각 파티션은 서로 다른 브로커에 분산 저장되어 있다.
 
 ### 1-2. 기존 메시지 처리 구조 도식
-![before-structure.png](before-structure.png)
-
+![before-structure.png](image/before-structure.png)
 #### 구조 설명
 - `payment-completed` 단일 토픽을 사용
 - 토픽은 3개의 파티션으로 구성되어 있으며, 브로커 3개에 분산됨
@@ -50,8 +49,14 @@
 
 ### 2. 효율적인  메시지 처리 구조 설계하기
 
-![after-structure.png](after-structure.png)
+![after-structure.png](image/after-structure.png)
 #### 2-1. 파티션 기반 병렬 처리 활성화
 - 기존 구조에서는 토픽의 파티션 수는 3개였으나, 컨슈머 그룹 내 컨슈머가 1개만 실행되어 병렬 처리가 이루어지지 않음
 - 이를 개선하기 위해 각 Consumer Group 당 Consumer 인스턴스를 맞춰 메시지를 소비할 수 있도록 함
+- As is : Consumer 인스턴스 각 1 -> To be : Consumer 인스턴스 각 3
+![parallel_structure_ui.png](image/parallel_structure_ui.png)
 
+### 왜 병렬처리로 변경하였을 때 더 효율적인가
+- 기존에는 하나의 컨슈머 인스턴스가 모든 파티션을 처리하여 메시지가 순차적으로 처리되었으나, 
+- concurrency를 3으로 설정하여 동일 그룹 내 컨슈머 인스턴스를 3개로 확장함으로서 각 컨슈머가 하나의 파티션을 전담하도록 개선하였다
+- 파티션 단위 병렬 처리가 가능해져 처리량이 증가하고, 트래픽 증가 시 발생할 수 있는 문제를 완화할 수 있다.
