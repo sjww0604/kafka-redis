@@ -32,6 +32,7 @@ public class DeliveryListener {
 	@KafkaListener(
 		topics = TOPIC_PAYMENT_COMPLETED,
 		groupId = "delivery-group",
+		concurrency = "3",
 		containerFactory = "deliveryKafkaListenerContainerFactory"
 	)
 	public void consume(PaymentCompletedEvent event) {

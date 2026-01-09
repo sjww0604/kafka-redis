@@ -35,6 +35,7 @@ public class ProductRankingListener  {
 	@KafkaListener(
 		topics = TOPIC_PAYMENT_COMPLETED,
 		groupId = "product-ranking-group",
+		concurrency = "3",
 		containerFactory = "productRankingKafkaListenerContainerFactory"
 	)
 	public void consumer(PaymentCompletedEvent event) {

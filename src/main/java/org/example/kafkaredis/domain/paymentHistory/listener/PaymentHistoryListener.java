@@ -30,6 +30,7 @@ public class PaymentHistoryListener {
 	@KafkaListener(
 		topics = "payment-completed",
 		groupId = "payment-history-group",
+		concurrency = "3",
 		containerFactory = "paymentHistoryKafkaListenerContainerFactory"
 	)
 	public void consume(PaymentCompletedEvent event) {
