@@ -32,6 +32,7 @@ public class ProductRankingListener  {
 
 	// 아까 등록한 ConsumerFactory, ListenerContainerFactory를 통해서
 	// Kafka에 있는 데이터를 가져올 것입니다.
+	// 컨슈머 인스턴스를 파티션의 수와 1:1로 맞추어 병렬 처리로 진행되게 함
 	@KafkaListener(
 		topics = TOPIC_PAYMENT_COMPLETED,
 		groupId = "product-ranking-group",

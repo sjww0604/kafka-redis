@@ -26,7 +26,7 @@ public class PaymentHistoryListener {
 	private final PaymentHistoryService paymentHistoryService;
 
 	// payment-completed 토픽을 구독하는 토픽의 데이터를 읽어오는 리스너를 만들어 줄 예정입니다.
-
+	// 컨슈머 인스턴스를 파티션의 수와 1:1로 맞추어 병렬 처리로 진행되게 함
 	@KafkaListener(
 		topics = "payment-completed",
 		groupId = "payment-history-group",

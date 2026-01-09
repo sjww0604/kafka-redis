@@ -29,6 +29,7 @@ public class DeliveryListener {
 
 	// 결제 완료 토픽 구독 -> 데이터 받아오기
 	// 받아온 데이터는 배송 전용 기능으로 사용할 것이다.
+	// 컨슈머 인스턴스를 파티션의 수와 1:1로 맞추어 병렬 처리로 진행되게 함
 	@KafkaListener(
 		topics = TOPIC_PAYMENT_COMPLETED,
 		groupId = "delivery-group",
